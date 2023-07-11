@@ -16,6 +16,8 @@ const runServer = () => {
     })
 };
 
+const syncDB = () => db.sync({force: true});
 
+syncDB();
 runServer();
 module.exports = app;;
