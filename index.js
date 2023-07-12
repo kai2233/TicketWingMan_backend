@@ -1,8 +1,11 @@
 const express = require("express");
+const session = require("express-session");
+const sequelizeStore = require("connect-session-sequelize")(session.Store)
+const passport = require("passport");
 const db = require("./db");
+const cors = require("cors");
 const app = express();
 const port = 8080;
-const cors = require("cors");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
