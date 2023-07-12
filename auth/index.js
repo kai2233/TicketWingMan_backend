@@ -31,4 +31,20 @@ router.post('/signup', async (req, res, next) => {
     }
 });
 
+router.post("/logout", (req, res, next) => {
+    req.logout((error) => {
+        if (error) {
+            return next(error);
+        }
+        res.redirect("/");
+    });
+    req.session.destroy();
+});
+
+router.get("/me", (req, res, next) => {
+    res.status(200).json(req.user);
+});
+
+router.use('/google',require('./google'));
+
 module.exports = router;
