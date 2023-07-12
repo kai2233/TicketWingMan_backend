@@ -2,7 +2,17 @@ const { Sequelize } = require("sequelize");
 const pg = require("pg");
 require('dotenv').config();
 
-const db = new Sequelize(`postgres://postgres:${process.env.dbPassword}@localhost:5432/${process.env.dbName}`, {
+/*
+  .evn file set up :
+    fill in your localhost contection info with following
+      dbUsername='' //username for login database
+      dbPassword='' //password for login database
+      dbPort='' //port for local database
+      dbName='' //the database name want to connect to
+*/
+const db = new Sequelize(
+  `postgres://${process.env.dbUsername}:${process.env.dbPassword}@localhost:${process.env.dbPort}/${process.env.dbName}`, 
+{
   logging: false,
 });
 
