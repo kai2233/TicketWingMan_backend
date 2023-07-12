@@ -18,7 +18,7 @@ const deserializeUser = async (user, done) => {
 }
 
 const configSession = () => ({
-  secert: "ticketWingMan_backend",
+  secret: "ticketWingMan_backend",
   store: store,
   resave: false,
   saveUninitialized: false,
