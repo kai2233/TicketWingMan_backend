@@ -9,6 +9,7 @@ const amadeus = new Amadeus({
     clientSecret: process.env.AMADUES_CLIENT_SECRET
 });
 
+
 // url will be -> 'http://localhost:8080/api/flights/id=[user_id] '
 router.get('/', async (req, res, next) => {
     try {
@@ -24,6 +25,39 @@ router.get('/', async (req, res, next) => {
         next(error);
     }
 });
+
+
+/*
+    expecting body from request
+        {
+            userId : 1
+            flightNumber: 'CX840',
+            departure_date: '2023-08-01 12:10:00-04'
+            arrival_date : '2023-08-01 14:45:00'
+        }
+*/
+// delete flight info from database given by user, without checking if data exists
+router.delete('/flight', async (req, res, next) => {
+    try {
+        const bodydata = req.body;
+        await Flights.destroy({
+            where : {
+                userId : bodydata.userId,
+                flight_number : bodydata.flightNumber,
+                departure_date : bodydata.departure_date,
+                arrival_date : bodydata.arrival_date
+            }
+        }).catch((error) => {
+            console.error(error.response);
+            next(error);
+        });
+        res.status(200).send({message : 'delete ok'});
+    } catch (error) {
+        console.error(error.response);
+        next(error);
+    }
+});
+
 
 /*
     expecting body from request
