@@ -66,6 +66,7 @@ router.delete('/flight', async (req, res, next) => {
             carrierCode : 'CX',
             flightNumber: '840',
             scheduledDepartureDate: '2023-07-13'
+            emissions : 110
         }
 */
 // insert flights info into database given by user, without checking duplicates
@@ -94,7 +95,7 @@ router.post('/newflight', async (req, res, next) => {
         const arrival_date = new Date(resData.flightPoints[1].arrival.timings[0].value);
 
         flightobj = {
-            flight_number, departure_date, departure_location, arrival_date, arrival_location, emissions : 0
+            flight_number, departure_date, departure_location, arrival_date, arrival_location, emissions : req.body.emissions
         }
         console.log('foundUser : ', foundUser[0].dataValues);
         
