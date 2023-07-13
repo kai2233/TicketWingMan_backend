@@ -5,7 +5,6 @@ const Flights = db.define('flight', {
     // not null, empty, and is pk
     flight_number : {
         type : DataTypes.TEXT,
-        primaryKey : true,
         allowNull : false,
         validate : {
             notEmpty : true
@@ -22,6 +21,14 @@ const Flights = db.define('flight', {
         }
     },
 
+    departure_location : {
+        type : DataTypes.STRING,
+        allowNull : false,
+        validate : {
+            notEmpty : true
+        }
+    },
+
     // not null, empty
     arrival_date : {
         type : DataTypes.DATE,
@@ -32,13 +39,21 @@ const Flights = db.define('flight', {
         }
     },
 
+    arrival_location : {
+        type : DataTypes.STRING,
+        allowNull : false,
+        validate : {
+            notEmpty : true
+        }
+    },
+
     // not null, empty
     emissions : {
         type : DataTypes.DECIMAL,
         allowNull : false,
-        validate : {
-            notEmpty : true,
-        }
+        // validate : { // for testing purposes
+        //     notEmpty : true,
+        // }
     }
 },
 
