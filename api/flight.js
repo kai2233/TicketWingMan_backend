@@ -10,7 +10,7 @@ const amadeus = new Amadeus({
 });
 
 
-// url will be -> 'http://localhost:8080/api/flights/id=[user_id] '
+// url will be -> 'http://localhost:8080/api/flights?id=[user_id] '
 router.get('/', async (req, res, next) => {
     try {
         const user_id = req.query.id;
