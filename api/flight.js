@@ -9,6 +9,22 @@ const amadeus = new Amadeus({
     clientSecret: process.env.AMADUES_CLIENT_SECRET
 });
 
+// url will be -> 'http://localhost:8080/api/flights/id=[user_id] '
+router.get('/', async (req, res, next) => {
+    try {
+        const user_id = req.query.id;
+        const reslut = await Flights.findAll({ where : {userId : user_id} })
+        .catch((error) => {
+            console.error(error);
+            next(error);
+        })
+        res.status(200).json(reslut);
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+});
+
 /*
     expecting body from request
         {
