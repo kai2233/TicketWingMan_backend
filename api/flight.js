@@ -46,12 +46,12 @@ router.post('/newflight', async (req, res, next) => {
         flightobj = {
             flight_number, departure_date, departure_location, arrival_date, arrival_location, emissions : 0
         }
-        console.log('foundUser : ', foundUser);
+        console.log('foundUser : ', foundUser[0].dataValues);
         
         // insert into database
         await Flights.create({
             ...flightobj,
-            userId : foundUser.id
+            userId :  foundUser[0].dataValues.id
         }); 
 
         res.status(200).send(resData);
