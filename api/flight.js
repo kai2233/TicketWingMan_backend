@@ -26,6 +26,46 @@ router.get('/', async (req, res, next) => {
     }
 });
 
+/*
+    {
+        originLocationCode -> require
+        destinationLocationCode -> require, in ISO 8601 YYYY-MM-DD format
+        departureDate -> require
+        returnDate : if not specified, only one-way itineraries are found
+        adults : -> more then 1, default value - 1
+        nonStop : ture for no transfer, default value - false
+        travelClass : ECONOMY, PREMIUM_ECONOMY, BUSINESS, FRIST, no value considers any class 
+        currencyCode :  ISO 4217 format, @see https://en.wikipedia.org/wiki/ISO_4217
+        max : maximum data be return, default value - 1
+    }
+example for this get request:
+    url : 'http://localhost:8080/api/flights/search?originLocationCode=SYD&destinationLocationCode=BKK&departureDate=2023-08-02&adults=1'
+*/
+// search all the flights by given info
+router.get('/search', async (req, res, next) => {
+    try {
+        const dataobj = {
+            originLocationCode : req.query.originLocationCode,
+            destinationLocationCode : req.query.destinationLocationCode,
+            departureDate : req.query.departureDate,
+            returnDate : req.query.returnDate, 
+            adults : req.query.adults ? req.query.adults : 1,
+            travelClass : req.query.travelClass,
+            currencyCode : req.query.currencyCode,
+            nonStop : req.query.nonStop ? req.query.nonStop : false,
+            max : req.query.max >= 1 ? req.query.max : 250
+        };
+        const response = await amadeus.shopping.flightOffersSearch.get(dataobj).catch(err => {
+            console.error(err);
+            next(err);
+        });
+        res.status(200).json(response.data);
+    } catch (error) {   
+        console.error(error);
+        next(error);
+    }
+});
+
 
 /*
     expecting body from request
