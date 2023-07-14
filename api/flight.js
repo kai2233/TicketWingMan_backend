@@ -130,14 +130,15 @@ router.post('/newflight', async (req, res, next) => {
     
     amadeus.schedule.flights.get(flightData).then(async function(response){
         const resData = response.data[0];
-        const flight_number = resData.flightDesignator.carrierCode + resData.flightDesignator.flightNumber;
+        const flight_number = resData.flightDesignator.flightNumber;
+        const carrier_code = resData.flightDesignator.carrierCode;
         const departure_location = resData.flightPoints[0].iataCode;
         const departure_date = new Date(resData.flightPoints[0].departure.timings[0].value);
         const arrival_location = resData.flightPoints[1].iataCode; 
         const arrival_date = new Date(resData.flightPoints[1].arrival.timings[0].value);
 
         flightobj = {
-            flight_number, departure_date, departure_location, arrival_date, arrival_location, emissions : req.body.emissions
+            carrier_code, flight_number, departure_date, departure_location, arrival_date, arrival_location, cabin_class : req.body.cabin_class, emissions : req.body.emissions ? req.body.emissions : 0
         }
         console.log('foundUser : ', foundUser[0].dataValues);
         
