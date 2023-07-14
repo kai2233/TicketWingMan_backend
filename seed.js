@@ -36,7 +36,8 @@ const UserSeed = [
 
 const FlightsSeed = [
     {
-        flight_number : 'TP487',
+        carrier_code : 'CX',
+        flight_number : 830,
         departure_date : '2023-08-01 12:10:00-04',
         departure_location : 'NCE', 
         arrival_date : '2023-08-01 14:45:00',
@@ -46,7 +47,8 @@ const FlightsSeed = [
     },
 
     {
-        flight_number : 'CX840',
+        carrier_code : 'TP',
+        flight_number : 487,
         departure_date : '2023-08-01 04:15:00-0',
         departure_location : 'HKG', 
         arrival_date : '2023-08-01 20:25:00',
