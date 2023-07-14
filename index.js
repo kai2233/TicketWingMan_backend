@@ -1,6 +1,6 @@
 const express = require("express");
 const session = require("express-session");
-const sequelizeStore = require("connect-session-sequelize")(session.Store)
+const sequelizeStore = require("connect-session-sequelize")(session.Store);
 const passport = require("passport");
 const db = require("./db");
 const cors = require("cors");
@@ -15,7 +15,7 @@ const deserializeUser = async (user, done) => {
   } catch (err) {
     done(err);
   }
-}
+};
 
 const configSession = () => ({
   secret: "ticketWingMan_backend",
@@ -23,7 +23,7 @@ const configSession = () => ({
   resave: false,
   saveUninitialized: false,
   cookie: { maxAge: 3 * 1000 * 60 * 60 },
-  httpOnly: true
+  httpOnly: true,
 });
 
 const setupMiddleware = (app) => {
@@ -49,13 +49,14 @@ const setupPassport = () => {
 
 const setupRoutes = (app) => {
   app.use("/api", require("./api"));
+  app.use("/auth", require("./auth"));
   app.get("/", (req, res) => {
     res.send("Hello! This is ticketWingMan backend");
   });
-}
+};
 
 const runServer = async (app, port) => {
-  await db.sync({ force: true});
+  await db.sync({ force: true });
   app.listen(port, () => {
     console.log(`server is running on port 8080`);
   });
