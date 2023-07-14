@@ -2,9 +2,16 @@ const { DataTypes } = require('sequelize');
 const db = require('../db');
 
 const Flights = db.define('flight', {
-    // not null, empty, and is pk
+    carrier_code : {
+        type : DataTypes.STRING,
+        allowNull : false,
+        validate : {
+            notEmpty : true
+        }
+    },
+
     flight_number : {
-        type : DataTypes.TEXT,
+        type : DataTypes.INTEGER,
         allowNull : false,
         validate : {
             notEmpty : true
@@ -42,6 +49,14 @@ const Flights = db.define('flight', {
     arrival_location : {
         type : DataTypes.STRING,
         allowNull : false,
+        validate : {
+            notEmpty : true
+        }
+    },
+
+    cabin_class : {
+        type : DataTypes.STRING,
+        defaultValue : 'economy',
         validate : {
             notEmpty : true
         }
