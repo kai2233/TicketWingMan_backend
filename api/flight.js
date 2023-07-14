@@ -108,6 +108,7 @@ router.delete('/flight', async (req, res, next) => {
             carrierCode : 'CX',
             flightNumber: '840',
             scheduledDepartureDate: '2023-07-13'
+            cabin_class : 'economy'
             emissions : 110
         }
 */
