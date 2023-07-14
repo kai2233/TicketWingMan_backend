@@ -31,7 +31,8 @@ router.get('/', async (req, res, next) => {
     expecting body from request
         {
             userId : 1
-            flightNumber: 'CX840',
+            carrier_code : 'CX',
+            flight_number : 830,
             departure_date: '2023-08-01 12:10:00-04'
             arrival_date : '2023-08-01 14:45:00'
         }
@@ -43,7 +44,8 @@ router.delete('/flight', async (req, res, next) => {
         await Flights.destroy({
             where : {
                 userId : bodydata.userId,
-                flight_number : bodydata.flightNumber,
+                flight_number : bodydata.flight_number,
+                carrier_code : bodydata.carrier_code,
                 departure_date : bodydata.departure_date,
                 arrival_date : bodydata.arrival_date
             }
