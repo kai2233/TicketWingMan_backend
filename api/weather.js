@@ -9,7 +9,7 @@ const dotenv = require("dotenv");
 //   date1 : '2023-01-01',
 //   date2 : '2023-07-08',
 // };
-router.get("/displayInFahrenheit", async (req, res, next) => {
+router.post("/displayInFahrenheit", async (req, res, next) => {
     try {
         // const date1 = '2023-01-01';
         // const date2 = '2023-07-08';
@@ -29,7 +29,7 @@ router.get("/displayInFahrenheit", async (req, res, next) => {
 });
 
 //http://localhost:8080/api/weather/displayInCelsius
-router.get("/displayInCelsius", async (req, res, next) => {
+router.post("/displayInCelsius", async (req, res, next) => {
     try {
         // const date1 = '2023-01-01';
         // const date2 = '2023-07-08';
