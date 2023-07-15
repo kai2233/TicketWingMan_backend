@@ -20,7 +20,7 @@ const Flights = db.define('flight', {
 
     // not null, empty
     departure_date : {
-        type : DataTypes.DATE,
+        type : DataTypes.STRING,
         allowNull : false,
         validate : {
             notEmpty : true,
@@ -38,7 +38,7 @@ const Flights = db.define('flight', {
 
     // not null, empty
     arrival_date : {
-        type : DataTypes.DATE,
+        type : DataTypes.STRING,
         allowNull : false,
         validate : {
             notEmpty : true,
@@ -66,9 +66,9 @@ const Flights = db.define('flight', {
     emissions : {
         type : DataTypes.DECIMAL,
         allowNull : false,
-        // validate : { // for testing purposes
-        //     notEmpty : true,
-        // }
+        validate : {
+            notEmpty : true,
+        }
     }
 },
 
