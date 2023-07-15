@@ -17,14 +17,12 @@ router.get('/', async (req, res, next) => {
     try {
         const user_id = req.query.id;
         const reslut = await Flights.findAll({ where : {userId : user_id} })
-        .catch((error) => {
-            console.error(error);
-            next(error);
-        })
-        res.status(200).json(reslut);
+        reslut ? 
+            res.status(200).json(reslut) : res.status(404).json({message : 'get failed'});
     } catch (error) {
         console.error(error);
         next(error);
+        res.status(404).json({message : 'get exception failed'})
     }
 });
 
@@ -63,10 +61,13 @@ router.get('/search', async (req, res, next) => {
             console.error(err);
             next(err);
         });
-        res.status(200).json(response.data);
+        response ? 
+            res.status(200).json(response.data) :
+            res.status(400).json({message : 'search failed'});
     } catch (error) {   
         console.error(error);
         next(error);
+        res.status(400).json({message : 'search exception failed'});
     }
 });
 
@@ -95,12 +96,14 @@ router.delete('/flight', async (req, res, next) => {
             }
         }).catch((error) => {
             console.error(error.response);
+            res.status(400).send({message : 'delete failed'});
             next(error);
         });
         res.status(200).send({message : 'delete ok'});
     } catch (error) {
         console.error(error.response);
         next(error);
+        res.status(400).send({message : 'delete exception failed'});
     }
 });
 
@@ -133,7 +136,7 @@ router.post('/newflight', async (req, res, next) => {
         return;
     }
     
-    amadeus.schedule.flights.get(flightData).then(async function(response){
+    amadeus.schedule.flights.get(flightData).then(async function(response) {
         const resData = response.data[0];
         const flight_number = resData.flightDesignator.flightNumber;
         const carrier_code = resData.flightDesignator.carrierCode;
@@ -160,6 +163,7 @@ router.post('/newflight', async (req, res, next) => {
     }).catch(function(responseError){
         console.log(responseError);
         next(responseError);
+        res.status(400).json({message : 'insert exception error'});
     });
 });
 
@@ -218,7 +222,7 @@ async function setEmission (flight, departureDate) {
             flight.emissions = -1;
         }
     } catch (error) {
-        console.error("The error is : ", error);   
+       throw error;
     }
 }
 
