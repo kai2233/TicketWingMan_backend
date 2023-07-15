@@ -38,9 +38,9 @@ const FlightsSeed = [
     {
         carrier_code : 'CX',
         flight_number : 830,
-        departure_date : '2023-08-01 12:10:00-04',
+        departure_date : '2023-08-01T12:10:00-04',
         departure_location : 'NCE', 
-        arrival_date : '2023-08-01 14:45:00',
+        arrival_date : '2023-08-01T14:45:00',
         arrival_location : 'LIS',
         emissions : 0,
         userId : 1 
@@ -49,9 +49,9 @@ const FlightsSeed = [
     {
         carrier_code : 'TP',
         flight_number : 487,
-        departure_date : '2023-08-01 04:15:00-0',
+        departure_date : '2023-08-01T04:15:00-0',
         departure_location : 'HKG', 
-        arrival_date : '2023-08-01 20:25:00',
+        arrival_date : '2023-08-01T20:25:00',
         arrival_location : 'JFK',
         emissions : 0,
         userId : 1 
