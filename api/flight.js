@@ -2,6 +2,7 @@
 const router = require("express").Router();
 const { User, Flights } = require("../db/models");
 require('dotenv').config();
+const axios = require('axios');
 const Amadeus = require('amadeus');
 
 const amadeus = new Amadeus({
@@ -9,6 +10,7 @@ const amadeus = new Amadeus({
     clientSecret: process.env.AMADUES_CLIENT_SECRET
 });
 
+const DateJs = require('../util/datejs');
 
 // url will be -> 'http://localhost:8080/api/flights?id=[user_id] '
 router.get('/', async (req, res, next) => {
@@ -27,16 +29,18 @@ router.get('/', async (req, res, next) => {
 });
 
 /*
-    {
-        originLocationCode -> require
-        destinationLocationCode -> require, in ISO 8601 YYYY-MM-DD format
-        departureDate -> require
-        returnDate : if not specified, only one-way itineraries are found
-        adults : -> more then 1, default value - 1
-        nonStop : ture for no transfer, default value - false
-        travelClass : ECONOMY, PREMIUM_ECONOMY, BUSINESS, FRIST, no value considers any class 
-        currencyCode :  ISO 4217 format, @see https://en.wikipedia.org/wiki/ISO_4217
-        max : maximum data be return, default value - 1
+    expecting query from request
+                * means require, ? means optional
+    { 
+        * originLocationCode
+        * destinationLocationCode : in ISO 8601 YYYY-MM-DD format
+        * departureDate
+        ? returnDate : if not specified, only one-way itineraries are found
+        ? adults : more then 1, default value - 1
+        ? nonStop : ture for no transfer, default value - false
+        ? travelClass : ECONOMY, PREMIUM_ECONOMY, BUSINESS, FRIST, no value considers any class 
+        ? currencyCode :  ISO 4217 format, @see https://en.wikipedia.org/wiki/ISO_4217
+        ? max : maximum data be return, default value - 250
     }
 example for this get request:
     url : 'http://localhost:8080/api/flights/search?originLocationCode=SYD&destinationLocationCode=BKK&departureDate=2023-08-02&adults=1'
@@ -134,20 +138,23 @@ router.post('/newflight', async (req, res, next) => {
         const flight_number = resData.flightDesignator.flightNumber;
         const carrier_code = resData.flightDesignator.carrierCode;
         const departure_location = resData.flightPoints[0].iataCode;
-        const departure_date = new Date(resData.flightPoints[0].departure.timings[0].value);
+        const departure_date = resData.flightPoints[0].departure.timings[0].value;
         const arrival_location = resData.flightPoints[1].iataCode; 
-        const arrival_date = new Date(resData.flightPoints[1].arrival.timings[0].value);
+        const arrival_date = resData.flightPoints[1].arrival.timings[0].value;
 
         flightobj = {
-            carrier_code, flight_number, departure_date, departure_location, arrival_date, arrival_location, cabin_class : req.body.cabin_class, emissions : req.body.emissions ? req.body.emissions : 0
+            carrier_code, flight_number, departure_date, departure_location, arrival_date, arrival_location, cabin_class : req.body.cabin_class ? req.body.cabin_class : 'economy', emissions : req.body.emissions ? req.body.emissions : -1
         }
-        console.log('foundUser : ', foundUser[0].dataValues);
+
+        await setEmission(flightobj, flightobj.departure_date);
+
+        console.log('flightobj : ', flightobj);
         
         // insert into database
         await Flights.create({
             ...flightobj,
             userId :  foundUser[0].dataValues.id
-        }); 
+        });  
 
         res.status(200).send(resData);
     }).catch(function(responseError){
@@ -155,5 +162,64 @@ router.post('/newflight', async (req, res, next) => {
         next(responseError);
     });
 });
+
+async function setEmission (flight, departureDate) {
+    if (flight.emissions > 0) {
+        return;
+    }
+
+    try {
+        const dateJs = new DateJs(departureDate);
+        const response = await axios.post(
+            'https://travelimpactmodel.googleapis.com/v1/flights:computeFlightEmissions',
+            {
+                'flights': [
+                    {
+                        'origin' : flight.departure_location,
+                        'destination' : flight.arrival_location,
+                        'operating_carrier_code' : flight.carrier_code,
+                        'flight_number' : flight.flight_number,
+                        'departure_date' : {
+                            'year' : dateJs.year(), 
+                            'month' : dateJs.month(), 
+                            'day' : dateJs.day()
+                        }
+                    },
+                ]
+            },
+            {
+              params: {
+                'key': process.env.TRAVEK_IMPACT_MODEL
+              },
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            }
+        );
+        const responsedata = response.data.flightEmissions[0];
+        
+        // example of return data
+        // emissionsGramsPerPax: {
+        //     first: 3201825,
+        //     business: 2561460,
+        //     premiumEconomy: 960547,
+        //     economy: 640365
+        //  }
+        //  economy, premium_economy, business, first
+        if (flight.cabin_class == 'economy') {
+            flight.emissions = responsedata.emissionsGramsPerPax.economy;
+        } else if (flight.cabin_class == 'premium_economy') {
+            flight.emissions = responsedata.emissionsGramsPerPax.premiumEconomy;
+        } else if (flight.cabin_class == 'business') {
+            flight.emissions = responsedata.emissionsGramsPerPax.business;
+        } else if (flight.cabin_class == 'first') {
+            flight.emissions = responsedata.emissionsGramsPerPax.first;
+        } else {
+            flight.emissions = -1;
+        }
+    } catch (error) {
+        console.error("The error is : ", error);   
+    }
+}
 
 module.exports = router;
