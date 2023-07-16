@@ -2,6 +2,7 @@ const router = require("express").Router();
 
 // Mounting the route handlers for users
 router.use("/user", require("./user"));
+router.use("/flights", require("./flight"));
 
 router.use("/weather", require("./weather"));
 
