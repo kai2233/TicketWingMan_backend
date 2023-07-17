@@ -7,7 +7,7 @@ const cors = require("cors");
 
 const store = new sequelizeStore({ db });
 
-const serialzieUser = (user, done) => done(null, user.id);
+const serializeUser = (user, done) => done(null, user.id);
 const deserializeUser = async (user, done) => {
   try {
     const user = await db.models.user.findByPk(user.id);
@@ -43,7 +43,14 @@ const setupMiddleware = (app) => {
 };
 
 const setupPassport = () => {
-  passport.serializeUser(serialzieUser);
+  // passport.serializeUser(function(user, done) {
+  //   done(null, user);
+  // });
+  
+  // passport.deserializeUser(function(user, done) {
+  //   done(null, user);
+  // });
+  passport.serializeUser(serializeUser); 
   passport.deserializeUser(deserializeUser);
 };
 
