@@ -2,6 +2,7 @@ const router = require("express").Router();
 const { User } = require("../db/models");
 
 router.post("/login", async (req, res, next) => {
+  console.log("login is triggered");
   try {
     const user = await User.findAll({ where: { email: req.body.email } });
     if (user || user.validatePassword(req.body.password)) {
@@ -15,6 +16,7 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.post("/signup", async (req, res, next) => {
+  console.log("singup is triggered");
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -42,6 +44,7 @@ router.post("/logout", (req, res, next) => {
 });
 
 router.get("/me", (req, res, next) => {
+  console.log("me is triggered");
   res.status(200).json(req.user);
 });
 

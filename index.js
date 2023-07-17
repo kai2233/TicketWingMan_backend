@@ -43,8 +43,13 @@ const setupMiddleware = (app) => {
 };
 
 const setupPassport = () => {
-  passport.serializeUser(serialzieUser);
-  passport.deserializeUser(deserializeUser);
+  passport.serializeUser(function(user, done) {
+    done(null, user);
+  });
+  
+  passport.deserializeUser(function(user, done) {
+    done(null, user);
+  });
 };
 
 const setupRoutes = (app) => {
