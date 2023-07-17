@@ -4,7 +4,7 @@ const { User } = require("../db/models");
 router.post("/login", async (req, res, next) => {
   console.log("login is triggered");
   try {
-    const user = await User.findAll({ where: { email: req.body.email } });
+    const user = await User.findOne({ where: { email: req.body.email } });
     if (user || user.validatePassword(req.body.password)) {
       req.login(user, (err) => (err ? next(err) : res.status(200).json(user)));
     } else {
