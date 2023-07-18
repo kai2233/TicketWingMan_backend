@@ -62,9 +62,10 @@ router.get('/search', async (req, res, next) => {
             console.error(err);
             next(err);
         });
-        var onewayFlag = dataobj.returnDate ? true : false;
+        var onewayFlag = dataobj.returnDate ? false : true;
+        console.log(onewayFlag);
         response ? 
-            // flightsFliter(org, arri, oneway, cabin, flightdata)
+            // // flightsFliter(org, arri, oneway, cabin, flightdata)
             res.status(200).json(flightsFilter(
                 dataobj.originLocationCode, 
                 dataobj.destinationLocationCode, 
@@ -72,6 +73,8 @@ router.get('/search', async (req, res, next) => {
                 dataobj.travelClass,
                 response.data)) :
             res.status(400).json({message : 'search failed'});
+            // res.status(200).json(response.data) :
+            // res.status(400).json({message : 'search failed'});
         const endTime = new Date;
         console.log('search time : ' + (beginTime.getTime() - endTime.getTime()));
     } catch (error) {   
