@@ -43,9 +43,11 @@ router.post("/logout", (req, res, next) => {
   req.session.destroy();
 });
 
-router.get("/me", (req, res, next) => {
+router.post("/me", async (req, res, next) =>{
   console.log("me is triggered");
-  res.status(200).json(req.user);
+  const foundUser = await User.findOne({ where: { email: req.body.email} });
+  console.log(foundUser);
+  req.login(foundUser, (err) => (err ? next(err) : res.status(200).json(foundUser)));
 });
 
 router.use("/google", require("./google"));

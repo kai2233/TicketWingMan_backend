@@ -71,7 +71,7 @@ router.put("/:email", async (req, res, next) => {
       // await User.update(req.body, { where: { email: userEmail } });
       // res.status(200).send("User updated successfully");
       await foundUser.update(req.body);
-      res.status(200).json(foundUser);
+      res.status(200).send("User updated successfully");
     }
   } catch (error) {
     next(error);
