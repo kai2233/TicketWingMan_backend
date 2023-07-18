@@ -63,13 +63,15 @@ router.post("/", async (req, res, next) => {
 router.put("/:email", async (req, res, next) => {
   try {
     const userEmail = req.params.email;
-    const foundUser = await User.findAll({ where: { email: userEmail } });
+    const foundUser = await User.findOne({ where: { email: userEmail } });
 
     if (!foundUser) {
       res.status(400).send("Failed to update User");
     } else {
-      await User.update(req.body, { where: { email: userEmail } });
-      res.status(200).send("User updated successfully");
+      // await User.update(req.body, { where: { email: userEmail } });
+      // res.status(200).send("User updated successfully");
+      await foundUser.update(req.body);
+      res.status(200).json(foundUser);
     }
   } catch (error) {
     next(error);
