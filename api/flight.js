@@ -46,6 +46,7 @@ example for this get request:
 // search all the flights by given info
 router.get('/search', async (req, res, next) => {
     try {
+        const beginTime = new Date;
         const dataobj = {
             originLocationCode : req.query.originLocationCode,
             destinationLocationCode : req.query.destinationLocationCode,
@@ -61,15 +62,112 @@ router.get('/search', async (req, res, next) => {
             console.error(err);
             next(err);
         });
+        var onewayFlag = dataobj.returnDate ? true : false;
         response ? 
-            res.status(200).json(response.data) :
+            // flightsFliter(org, arri, oneway, cabin, flightdata)
+            res.status(200).json(flightsFilter(
+                dataobj.originLocationCode, 
+                dataobj.destinationLocationCode, 
+                onewayFlag, 
+                dataobj.travelClass,
+                response.data)) :
             res.status(400).json({message : 'search failed'});
+        const endTime = new Date;
+        console.log('search time : ' + (beginTime.getTime() - endTime.getTime()));
     } catch (error) {   
         console.error(error);
         next(error);
         res.status(400).json({message : 'search exception failed'});
     }
 });
+
+
+
+/*
+{
+    "type": "flight-offer",
+    oneWay,
+    origin_airport,
+    arrival_airport,
+    cabin,
+    tickets: [
+        departure_ticket : [
+            {
+                departure : {
+                    iataCode, time
+                },
+                arrival : {
+                    iataCode, time
+                },
+                flight : {
+                    carrierCode: 'PR', number: '212'
+                }
+                flight_number,
+                duration
+            }, ....
+        ]
+    ],
+    total_departure_duration,
+    total_return_duration
+}
+*/
+function flightsFilter(org, arri, oneway, cabin, flightdata) {
+    const final = [];
+    flightdata.forEach(ticketData => {
+        const segments = ticketData.itineraries[0].segments;
+        const origin_airport = segments[0].departure.iataCode;
+        const final_airport = segments[segments.length - 1].arrival.iataCode;
+        
+        if (origin_airport !== org || final_airport !== arri) {
+            return;
+        }
+
+        const newdata = {};
+        newdata.type = ticketData.type;
+        newdata.oneWay = oneway;
+        newdata.origin_airport = origin_airport;
+        newdata.arrival_airport = final_airport;
+        newdata.cabin = cabin;
+        const departure_segments = segments;
+        newdata.tickets = {};
+    
+        newdata.total_departure_duration = ticketData.itineraries[0].duration;
+        newdata.tickets.departure_ticket = segmentsFilter(departure_segments);
+
+        if (!oneway) {
+            const return_segments = ticketData.itineraries[1].segments;
+            newdata.total_return_duration = ticketData.itineraries[1].duration;
+            newdata.tickets.return_ticket = segmentsFilter(return_segments);
+        }
+
+        final.push(newdata);
+    });
+    return final;
+}
+
+function segmentsFilter(segments) {
+    const return_segments = [];
+    segments.forEach(element => {
+        const way = {
+            departure : {
+                iataCode: element.departure.iataCode,
+                time : element.departure.at.replace('T', ' ')
+            },
+            arrival : {
+                iataCode: element.arrival.iataCode,
+                time : element.arrival.at.replace('T', ' ')
+            },
+            flight : {
+                carrierCode : element.carrierCode,
+                number : element.number,
+            },
+            flight_number : element.carrierCode + ' ' + element.number,
+            duration : element.duration.substring(2),
+        }
+        return_segments.push(way);
+    });
+    return return_segments;
+}
 
 
 /*
