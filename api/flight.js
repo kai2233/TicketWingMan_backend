@@ -62,16 +62,18 @@ router.get('/search', async (req, res, next) => {
             console.error(err);
             next(err);
         });
-        var onewayFlag = dataobj.returnDate ? true : false;
+        var onewayFlag = dataobj.returnDate ? false : true;
+        console.log(onewayFlag);
         response ? 
             // flightsFliter(org, arri, oneway, cabin, flightdata)
             res.status(200).json(flightsFilter(
                 dataobj.originLocationCode, 
                 dataobj.destinationLocationCode, 
-                onewayFlag, 
-                dataobj.travelClass,
+                onewayFlag,
                 response.data)) :
             res.status(400).json({message : 'search failed'});
+            // res.status(200).json(response.data) :
+            // res.status(400).json({message : 'search failed'});
         const endTime = new Date;
         console.log('search time : ' + (beginTime.getTime() - endTime.getTime()));
     } catch (error) {   
@@ -111,7 +113,7 @@ router.get('/search', async (req, res, next) => {
     total_return_duration
 }
 */
-function flightsFilter(org, arri, oneway, cabin, flightdata) {
+function flightsFilter(org, arri, oneway, flightdata) {
     const final = [];
     flightdata.forEach(ticketData => {
         const segments = ticketData.itineraries[0].segments;
@@ -127,17 +129,27 @@ function flightsFilter(org, arri, oneway, cabin, flightdata) {
         newdata.oneWay = oneway;
         newdata.origin_airport = origin_airport;
         newdata.arrival_airport = final_airport;
-        newdata.cabin = cabin;
         const departure_segments = segments;
         newdata.tickets = {};
     
         newdata.total_departure_duration = ticketData.itineraries[0].duration;
         newdata.tickets.departure_ticket = segmentsFilter(departure_segments);
 
+        const segmentDetails = ticketData.travelerPricings[0].fareDetailsBySegment;
+        for (var i = 0; i < segments.length; i++) {
+            newdata.tickets.departure_ticket[i].cabin = segmentDetails[i].cabin;
+            // newdata.cabin.departure_cabin.push(segmentDetails[i].cabin);
+        }
+
         if (!oneway) {
             const return_segments = ticketData.itineraries[1].segments;
             newdata.total_return_duration = ticketData.itineraries[1].duration;
             newdata.tickets.return_ticket = segmentsFilter(return_segments);
+            // newdata.cabin.return_cabin = [];
+            for (var i = newdata.tickets.departure_ticket.length; i < segmentDetails.length; i++) {
+                newdata.tickets.return_ticket[i - newdata.tickets.departure_ticket.length].cabin = segmentDetails[i].cabin;
+                // newdata.cabin.return_cabin.push(segmentDetails[i].cabin);
+            }
         }
 
         final.push(newdata);
@@ -163,6 +175,7 @@ function segmentsFilter(segments) {
             },
             flight_number : element.carrierCode + ' ' + element.number,
             duration : element.duration.substring(2),
+            cabin : undefined
         }
         return_segments.push(way);
     });
