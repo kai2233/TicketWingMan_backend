@@ -54,7 +54,7 @@ router.get('/search', async (req, res, next) => {
             returnDate : req.query.returnDate, 
             adults : req.query.adults ? req.query.adults : 1,
             travelClass : req.query.travelClass,
-            currencyCode : req.query.currencyCode,
+            currencyCode : req.query.currencyCode ? req.query.currencyCode : 'USD',
             nonStop : req.query.nonStop ? req.query.nonStop : false,
             max : req.query.max >= 1 ? req.query.max : 250
         };
@@ -150,6 +150,11 @@ function flightsFilter(org, arri, oneway, flightdata) {
                 newdata.tickets.return_ticket[i - newdata.tickets.departure_ticket.length].cabin = segmentDetails[i].cabin;
                 // newdata.cabin.return_cabin.push(segmentDetails[i].cabin);
             }
+        }
+
+        newdata.total_price = {
+            total : ticketData.price.total,
+            currency : ticketData.price.currency
         }
 
         final.push(newdata);
