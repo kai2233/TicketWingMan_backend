@@ -75,7 +75,7 @@ router.get('/search', async (req, res, next) => {
         const endTime = new Date;
         console.log('search time : ' + (beginTime.getTime() - endTime.getTime()));
     } catch (error) {   
-        console.error(error);
+        // console.error(error);
         next(error);
         res.status(400).json({message : 'search exception failed'});
     }
@@ -131,7 +131,7 @@ async function flightsFilter(org, arri, oneway, flightdata, locations) {
         const departure_segments = segments;
         newdata.tickets = {};
 
-        newdata.total_departure_duration = ticketData.itineraries[0].duration;
+        newdata.total_departure_duration = ticketData.itineraries[0].duration.substring(2);
         newdata.tickets.departure_ticket = segmentsFilter(departure_segments, locations);
 
         const segmentDetails = ticketData.travelerPricings[0].fareDetailsBySegment;
@@ -152,7 +152,7 @@ async function flightsFilter(org, arri, oneway, flightdata, locations) {
 
         if (!oneway) {
             const return_segments = ticketData.itineraries[1].segments;
-            newdata.total_return_duration = ticketData.itineraries[1].duration;
+            newdata.total_return_duration = ticketData.itineraries[1].duration.substring(2);
             newdata.tickets.return_ticket = segmentsFilter(return_segments, locations);
             for (var i = newdata.tickets.departure_ticket.length; i < segmentDetails.length; i++) {
                 newdata.tickets.return_ticket[i - newdata.tickets.departure_ticket.length].cabin = segmentDetails[i].cabin;
