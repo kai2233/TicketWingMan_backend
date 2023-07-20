@@ -11,6 +11,7 @@ const amadeus = new Amadeus({
 });
 
 const DateJs = require('../util/datejs');
+const { response } = require("express");
 
 // url will be -> 'http://localhost:8080/api/flights?id=[user_id] '
 router.get('/', async (req, res, next) => {
@@ -63,17 +64,14 @@ router.get('/search', async (req, res, next) => {
             next(err);
         });
         var onewayFlag = dataobj.returnDate ? false : true;
-        console.log(onewayFlag);
         response ? 
-            // flightsFliter(org, arri, oneway, cabin, flightdata)
-            res.status(200).json(flightsFilter(
+            res.status(200).json(await flightsFilter(
                 dataobj.originLocationCode, 
                 dataobj.destinationLocationCode, 
                 onewayFlag,
-                response.data)) :
+                response.data,
+                response.result.dictionaries.locations)) :
             res.status(400).json({message : 'search failed'});
-            // res.status(200).json(response.data) :
-            // res.status(400).json({message : 'search failed'});
         const endTime = new Date;
         console.log('search time : ' + (beginTime.getTime() - endTime.getTime()));
     } catch (error) {   
@@ -113,16 +111,17 @@ router.get('/search', async (req, res, next) => {
     total_return_duration
 }
 */
-function flightsFilter(org, arri, oneway, flightdata) {
-    const final = [];
-    flightdata.forEach(ticketData => {
+async function flightsFilter(org, arri, oneway, flightdata, locations) {
+
+
+    const filteredFlights = filterOriginFlights(flightdata, org, arri);
+
+     
+ 
+    const populateWithEmissions =  filteredFlights.map(async ticketData => {
         const segments = ticketData.itineraries[0].segments;
         const origin_airport = segments[0].departure.iataCode;
         const final_airport = segments[segments.length - 1].arrival.iataCode;
-        
-        if (origin_airport !== org || final_airport !== arri) {
-            return;
-        }
 
         const newdata = {};
         newdata.type = ticketData.type;
@@ -131,60 +130,92 @@ function flightsFilter(org, arri, oneway, flightdata) {
         newdata.arrival_airport = final_airport;
         const departure_segments = segments;
         newdata.tickets = {};
-    
+
         newdata.total_departure_duration = ticketData.itineraries[0].duration;
-        newdata.tickets.departure_ticket = segmentsFilter(departure_segments);
+        newdata.tickets.departure_ticket = segmentsFilter(departure_segments, locations);
 
         const segmentDetails = ticketData.travelerPricings[0].fareDetailsBySegment;
-        for (var i = 0; i < segments.length; i++) {
+
+        for (var i = 0; i < segments.length; i++) { //set cabin for each departure_ticket
             newdata.tickets.departure_ticket[i].cabin = segmentDetails[i].cabin;
-            // newdata.cabin.departure_cabin.push(segmentDetails[i].cabin);
+        }
+
+        for (const ticket of newdata.tickets.departure_ticket) {
+            await setEmission({
+                    departure_location : ticket.departure.iataCode,
+                    arrival_location : ticket.arrival.iataCode,
+                    carrier_code : ticket.flight.carrierCode,
+                    flight_number : ticket.flight.number,
+                    cabin_class : ticket.cabin
+                }, ticket.departure.time, ticket)
         }
 
         if (!oneway) {
             const return_segments = ticketData.itineraries[1].segments;
             newdata.total_return_duration = ticketData.itineraries[1].duration;
-            newdata.tickets.return_ticket = segmentsFilter(return_segments);
-            // newdata.cabin.return_cabin = [];
+            newdata.tickets.return_ticket = segmentsFilter(return_segments, locations);
             for (var i = newdata.tickets.departure_ticket.length; i < segmentDetails.length; i++) {
                 newdata.tickets.return_ticket[i - newdata.tickets.departure_ticket.length].cabin = segmentDetails[i].cabin;
-                // newdata.cabin.return_cabin.push(segmentDetails[i].cabin);
+            }
+
+            for (const ticket of newdata.tickets.return_ticket) {
+                await setEmission({
+                    departure_location : ticket.departure.iataCode,
+                    arrival_location : ticket.arrival.iataCode,
+                    carrier_code : ticket.flight.carrierCode,
+                    flight_number : ticket.flight.number,
+                    cabin_class : ticket.cabin
+                }, ticket.departure.time, ticket);
             }
         }
 
         newdata.total_price = {
-            total : ticketData.price.total,
-            currency : ticketData.price.currency
+            total: ticketData.price.total,
+            currency: ticketData.price.currency
         }
+        return newdata;
 
-        final.push(newdata);
-    });
-    return final;
+    })
+    return Promise.all(populateWithEmissions);
 }
 
-function segmentsFilter(segments) {
-    const return_segments = [];
-    segments.forEach(element => {
-        const way = {
-            departure : {
+function filterOriginFlights(flightdata, org, arri) {
+    const filteredFlights = flightdata.filter(ticketData => {
+        const segments = ticketData.itineraries[0].segments;
+        const origin_airport = segments[0].departure.iataCode;
+        const final_airport = segments[segments.length - 1].arrival.iataCode;
+
+        return (origin_airport == org || final_airport == arri)
+    })
+    return filteredFlights;
+}
+
+function segmentsFilter(segments, locations) {
+    return segments.map(element => {
+        return {
+            departure: {
                 iataCode: element.departure.iataCode,
-                time : element.departure.at.replace('T', ' ')
+                time: element.departure.at.replace('T', ' '),
+                location : {
+                    ... locations[element.departure.iataCode]
+                } 
             },
-            arrival : {
+            arrival: {
                 iataCode: element.arrival.iataCode,
-                time : element.arrival.at.replace('T', ' ')
+                time: element.arrival.at.replace('T', ' '),
+                location : {
+                    ... locations[element.arrival.iataCode]
+                } 
             },
-            flight : {
-                carrierCode : element.carrierCode,
-                number : element.number,
+            flight: {
+                carrierCode: element.carrierCode,
+                number: element.number,
             },
-            flight_number : element.carrierCode + ' ' + element.number,
-            duration : element.duration.substring(2),
-            cabin : undefined
+            flight_number: element.carrierCode + ' ' + element.number,
+            duration: element.duration.substring(2),
+            cabin: undefined
         }
-        return_segments.push(way);
     });
-    return return_segments;
 }
 
 
@@ -265,9 +296,8 @@ router.post('/newflight', async (req, res, next) => {
             carrier_code, flight_number, departure_date, departure_location, arrival_date, arrival_location, cabin_class : req.body.cabin_class ? req.body.cabin_class : 'economy', emissions : req.body.emissions ? req.body.emissions : -1
         }
 
-        await setEmission(flightobj, flightobj.departure_date);
-
         console.log('flightobj : ', flightobj);
+        await setEmission(flightobj, flightobj.departure_date, flightobj);
         
         // insert into database
         await Flights.create({
@@ -283,7 +313,7 @@ router.post('/newflight', async (req, res, next) => {
     });
 });
 
-async function setEmission (flight, departureDate) {
+async function setEmission (flight, departureDate, finalDate) {
     if (flight.emissions > 0) {
         return;
     }
@@ -315,31 +345,29 @@ async function setEmission (flight, departureDate) {
                 'Content-Type': 'application/json'
               }
             }
-        );
+        ).catch(error => {
+            console.error(error);
+            throw error;
+        });
         const responsedata = response.data.flightEmissions[0];
-        
-        // example of return data
-        // emissionsGramsPerPax: {
-        //     first: 3201825,
-        //     business: 2561460,
-        //     premiumEconomy: 960547,
-        //     economy: 640365
-        //  }
-        //  economy, premium_economy, business, first
-        if (flight.cabin_class == 'economy') {
-            flight.emissions = responsedata.emissionsGramsPerPax.economy;
-        } else if (flight.cabin_class == 'premium_economy') {
-            flight.emissions = responsedata.emissionsGramsPerPax.premiumEconomy;
-        } else if (flight.cabin_class == 'business') {
-            flight.emissions = responsedata.emissionsGramsPerPax.business;
-        } else if (flight.cabin_class == 'first') {
-            flight.emissions = responsedata.emissionsGramsPerPax.first;
+        if (!responsedata.emissionsGramsPerPax) {
+            finalDate.emissions = -1;
+        } else if (flight.cabin_class.toLowerCase() == 'economy') {
+            finalDate.emissions = responsedata.emissionsGramsPerPax.economy;
+        } else if (flight.cabin_class.toLowerCase() == 'premium_economy') {
+            finalDate.emissions = responsedata.emissionsGramsPerPax.premiumEconomy;
+        } else if (flight.cabin_class.toLowerCase() == 'business') {
+            finalDate.emissions = responsedata.emissionsGramsPerPax.business;
+        } else if (flight.cabin_class.toLowerCase() == 'first') {
+            finalDate.emissions = responsedata.emissionsGramsPerPax.first;
         } else {
-            flight.emissions = -1;
+            finalDate.emissions = -1;
         }
     } catch (error) {
        throw error;
     }
+    
+    return response;
 }
 
 module.exports = router;
