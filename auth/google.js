@@ -15,14 +15,11 @@ passport.use(
       try {
         const googleId = profile.id;
         const email = profile.emails[0].value;
-        const imgUrl = profile.photos[0].value;
         const firstName = profile.name.givenName;
         const lastName = profile.name.familyName;
-        const fullName = profile.displayName;
-
         const [user] = await User.findOrCreate({
           where: { googleId },
-          defaults: { email, imgUrl, firstName, lastName, fullName },
+          defaults: { email, firstName, lastName},
         });
 
         done(null, user);
