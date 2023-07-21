@@ -77,7 +77,7 @@ router.post("/logout", (req, res, next) => {
 });
 
 // auth/me
-router.get("/me", async (req, res, next) => {
+router.post("/me", async (req, res, next) => {
   try {
     if (!req.user) {
       return;
