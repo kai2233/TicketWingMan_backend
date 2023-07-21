@@ -32,9 +32,9 @@ router.get('/', async (req, res, next) => {
     expecting query from request
                 * means require, ? means optional
     { 
-        * originLocationCode
-        * destinationLocationCode : in ISO 8601 YYYY-MM-DD format
-        * departureDate
+        * originLocationCode : iata code 
+        * destinationLocationCode : iata code 
+        * departureDate : in ISO 8601 YYYY-MM-DD format
         ? returnDate : if not specified, only one-way itineraries are found
         ? adults : more then 1, default value - 1
         ? nonStop : ture for no transfer, default value - false
