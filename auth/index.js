@@ -77,15 +77,13 @@ router.post("/logout", (req, res, next) => {
 });
 
 // auth/me
-router.get("/me", (req, res, next) => {
+router.get("/me", async (req, res, next) => {
   try {
     if (!req.user) {
       return;
     }
-    res.status(200).json({
-      id: req.user.id,
-      email: req.user.email,
-    });
+    const foundUser = await User.findOne({ where: { email: req.user.email } });
+    res.status(200).json(foundUser);
   } catch (error) {
     console.error(error);
   }
