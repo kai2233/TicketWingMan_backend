@@ -27,6 +27,7 @@ router.get('/', async (req, res, next) => {
     }
 });
 
+
 /*
     expecting query from request
                 * means require, ? means optional
@@ -81,42 +82,60 @@ router.get('/search', async (req, res, next) => {
     }
 });
 
-
-
 /*
 {
+return ->
     "type": "flight-offer",
     oneWay,
     origin_airport,
     arrival_airport,
-    cabin,
-    tickets: [
+    tickets: {
         departure_ticket : [
             {
                 departure : {
-                    iataCode, time
+                    iataCode, time, location {cityCode, countryCode}
                 },
                 arrival : {
-                    iataCode, time
+                    iataCode, time, location {cityCode, countryCode}
                 },
                 flight : {
-                    carrierCode: 'PR', number: '212'
+                    carrierCode, number
                 }
                 flight_number,
-                duration
+                duration,
+                cabin,
+                emissions
             }, ....
+        ],
+        return_ticket: [
+            {
+                departure : {
+                    iataCode, time, location {cityCode, countryCode}
+                },
+                arrival : {
+                    iataCode, time, location {cityCode, countryCode}
+                },
+                flight : {
+                    carrierCode, number
+                }
+                flight_number,
+                duration,
+                cabin,
+                emissions
+            }
         ]
-    ],
+    },
     total_departure_duration,
-    total_return_duration
+    total_return_duration，
+    total_price: {
+        total,
+        currency
+    }
 }
 */
 async function flightsFilter(org, arri, oneway, flightdata, locations) {
 
-
     const filteredFlights = filterOriginFlights(flightdata, org, arri);
-
-     
  
     const populateWithEmissions =  filteredFlights.map(async ticketData => {
         const segments = ticketData.itineraries[0].segments;
@@ -314,7 +333,7 @@ router.post('/newflight', async (req, res, next) => {
 });
 
 async function setEmission (flight, departureDate, finalDate) {
-    if (flight.emissions > 0) {
+    if (finalDate.emissions > 0) {
         return;
     }
 
