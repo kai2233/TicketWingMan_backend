@@ -54,7 +54,7 @@ const Flights = db.define('flight', {
         }
     },
 
-    cabin_class : {
+    cabin : {
         type : DataTypes.STRING,
         defaultValue : 'economy',
         validate : {
