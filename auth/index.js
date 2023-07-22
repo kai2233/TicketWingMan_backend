@@ -90,5 +90,6 @@ router.post("/me", async (req, res, next) => {
 });
 
 router.use("/google", require("./google"));
+router.use("/github", require("./github"));
 
 module.exports = router;
