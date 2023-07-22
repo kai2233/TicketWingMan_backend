@@ -44,6 +44,9 @@ User.init(
     googleId: {
       type: DataTypes.STRING,
     },
+    githubId: {
+      type: DataTypes.STRING,
+    },
     favorite: {
       type: DataTypes.INTEGER,
       allowNull: true,
