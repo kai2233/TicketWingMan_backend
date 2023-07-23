@@ -12,14 +12,15 @@ passport.use(
             callbackURL: process.env.GITHUB_CALLBACK_URL,
         },
         async (accessToken, refreshToken, profile, done) => {
+            console.log(profile);
             try {
                 const githubId = profile.id;
-                const email = profile.emails[0].value;
-                const firstName = profile.name.givenName;
-                const lastName = profile.name.familyName;
+                const email = (profile.emails===null) ? profile.emails : profile.profileUrl;
+                const firstName = (profile.displayName) ? profile.displayName : undefined;
+                const lastName = (profile.displayName) ? profile.displayName: undefined;
                 const [user] = await User.findOrCreate({
                     where: { githubId },
-                    defaults: { email, firstName, lastName },
+                    defaults: { email, firstName: firstName.split(" ")[0], lastName: lastName.split(" ")[1]},
                 });
 
                 done(null, user);
