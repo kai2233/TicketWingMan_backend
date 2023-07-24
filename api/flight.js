@@ -72,17 +72,17 @@ router.get('/search', async (req, res, next) => {
         var onewayFlag = dataobj.returnDate ? false : true;
 
         const filteredFlights = filterOriginFlights(response.data, dataobj.originLocationCode, dataobj.destinationLocationCode);
-        const chunk = 15;
-        const length = parseInt(filteredFlights.length / chunk) + 1;
-        const reslut = [];
-        for (var i = 0; i < length; i++) {
-            reslut.push( ...(await flightsFilter( 
+  
+        const reslut = await flightsFilter( 
                         onewayFlag,
-                        filteredFlights.splice(0, chunk), 
+                        filteredFlights, 
                         response.result.dictionaries.locations
-                    ))
-            );
-        }
+                    );
+
+        await setEmissionCall(reslut, onewayFlag);
+
+        console.log('emission_call :', emission_call);
+        
         res.status(200).json(reslut);
         const endTime = new Date;
         console.log('search time : ' + (beginTime.getTime() - endTime.getTime()));
@@ -171,10 +171,34 @@ async function flightsFilter(oneway, flightdata, locations) {
             newdata.tickets.departure_ticket[i].cabin = segmentDetails[i].cabin;
         }
 
-        const emissionreq_departrue = [];
-        for (const ticket of newdata.tickets.departure_ticket) { 
-            const departuredate = new DateJs(ticket.departure.time);
-            emissionreq_departrue.push({
+        if (!oneway) {
+            const return_segments = ticketData.itineraries[1].segments;
+            newdata.total_return_duration = ticketData.itineraries[1].duration.substring(2);
+            newdata.tickets.return_ticket = segmentsFilter(return_segments, locations);
+            for (var i = newdata.tickets.departure_ticket.length; i < segmentDetails.length; i++) {
+                newdata.tickets.return_ticket[i - newdata.tickets.departure_ticket.length].cabin = segmentDetails[i].cabin;
+            }
+        }
+
+        newdata.total_price = {
+            total: ticketData.price.total,
+            currency: ticketData.price.currency
+        }
+
+        return newdata;
+    });
+
+    return Promise.all(populateWithEmissions);
+}
+
+async function setEmissionCall(flightsoffered, oneway) {
+    const data_temp = [];
+    const emissionreq = [];
+
+    function setRequestData(ticket) {
+        const departuredate = new DateJs(ticket.departure.time);
+        return (
+            {
                 origin : ticket.departure.iataCode,
                 destination : ticket.arrival.iataCode,
                 operating_carrier_code : ticket.flight.carrierCode,
@@ -184,45 +208,26 @@ async function flightsFilter(oneway, flightdata, locations) {
                     month : departuredate.month(), 
                     day : departuredate.day()
                 }
-            });
-        }
+            }
+        )
+    }
 
-        await setEmission(emissionreq_departrue, newdata.tickets.departure_ticket);
+    for (const flight of flightsoffered) {
+        const tickets_departure = flight.tickets.departure_ticket;
+        for (const ticket of tickets_departure) { 
+            emissionreq.push(setRequestData(ticket));
+            data_temp.push(ticket);
+        }
 
         if (!oneway) {
-            const return_segments = ticketData.itineraries[1].segments;
-            newdata.total_return_duration = ticketData.itineraries[1].duration.substring(2);
-            newdata.tickets.return_ticket = segmentsFilter(return_segments, locations);
-            for (var i = newdata.tickets.departure_ticket.length; i < segmentDetails.length; i++) {
-                newdata.tickets.return_ticket[i - newdata.tickets.departure_ticket.length].cabin = segmentDetails[i].cabin;
+            const tickets_return = flight.tickets.return_ticket;
+            for (const ticket of tickets_return) {
+                emissionreq.push(setRequestData(ticket));
+                data_temp.push(ticket);
             }
-
-            const emissionreq_return = [];
-            for (const ticket of newdata.tickets.return_ticket) {
-                const departuredate = new DateJs(ticket.departure.time);
-                emissionreq_return.push({
-                    origin : ticket.departure.iataCode,
-                    destination : ticket.arrival.iataCode,
-                    operating_carrier_code : ticket.flight.carrierCode,
-                    flight_number : ticket.flight.number,
-                    departure_date : {
-                        year : departuredate.year(), 
-                        month : departuredate.month(), 
-                        day : departuredate.day()
-                    }
-                });
-            }
-            await setEmission(emissionreq_return, newdata.tickets.return_ticket);
         }
-
-        newdata.total_price = {
-            total: ticketData.price.total,
-            currency: ticketData.price.currency
-        }
-        return newdata;
-
-    })
-    return Promise.all(populateWithEmissions);
+    }
+    await setEmission(emissionreq, data_temp);
 }
 
 function filterOriginFlights(flightdata, org, arri) {
@@ -370,7 +375,9 @@ router.post('/newflight', async (req, res, next) => {
     });
 });
 
+var emission_call = 0;
 async function setEmission (flightArray, finalData) {
+    emission_call++;
     try {
         const response = await axios.post(
             'https://travelimpactmodel.googleapis.com/v1/flights:computeFlightEmissions',
