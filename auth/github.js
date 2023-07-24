@@ -12,10 +12,10 @@ passport.use(
             callbackURL: process.env.GITHUB_CALLBACK_URL,
         },
         async (accessToken, refreshToken, profile, done) => {
-            console.log(profile);
+            console.log(profile._json.email===null);
             try {
                 const githubId = profile.id;
-                const email = (profile.emails===null) ? profile.emails : profile.profileUrl;
+                const email = (profile._json.email===null) ? (profile._json.login) : (profile._json.email);
                 const firstName = (profile.displayName) ? profile.displayName : undefined;
                 const lastName = (profile.displayName) ? profile.displayName: undefined;
                 const [user] = await User.findOrCreate({
