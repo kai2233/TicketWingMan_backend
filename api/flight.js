@@ -71,15 +71,16 @@ router.get('/search', async (req, res, next) => {
 
         var onewayFlag = dataobj.returnDate ? false : true;
 
-        const length = parseInt(dataobj.max / 100) + 1;
+        const filteredFlights = filterOriginFlights(response.data, dataobj.originLocationCode, dataobj.destinationLocationCode);
         const chunk = 100;
+        const length = parseInt(filteredFlights.length / chunk) + 1;
         const reslut = [];
         for (var i = 0; i < length; i++) {
             reslut.push( ...(await flightsFilter(
                         dataobj.originLocationCode, 
                         dataobj.destinationLocationCode, 
                         onewayFlag,
-                        response.data.splice(0, chunk), 
+                        filteredFlights.splice(0, chunk), 
                         response.result.dictionaries.locations
                     ))
             );
@@ -147,9 +148,10 @@ return ->
 */
 async function flightsFilter(org, arri, oneway, flightdata, locations) {
 
-    const filteredFlights = filterOriginFlights(flightdata, org, arri);
+    // console.log('filteredFlights :' ,flightdata.length);
+    // if (flightdata.length == 0) {return;}
  
-    const populateWithEmissions = filteredFlights.map(async ticketData => {
+    const populateWithEmissions = flightdata.map(async ticketData => {
         const segments = ticketData.itineraries[0].segments;
         const origin_airport = segments[0].departure.iataCode;
         const final_airport = segments[segments.length - 1].arrival.iataCode;
@@ -383,7 +385,8 @@ async function setEmission (flightArray, finalData) {
               },
               headers: {
                 'Content-Type': 'application/json'
-              }
+              },
+              timeout: 5000
             }
         ).catch(error => {
             console.error(error.response);
