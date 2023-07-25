@@ -10,12 +10,12 @@ passport.use(
             clientID: process.env.GITHUB_CLIENT_ID,
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
             callbackURL: process.env.GITHUB_CALLBACK_URL,
+            scope:["user:email"]
         },
         async (accessToken, refreshToken, profile, done) => {
-            console.log(profile._json.email===null);
             try {
                 const githubId = profile.id;
-                const email = (profile._json.email===null) ? (profile._json.login) : (profile._json.email);
+                const email = profile.emails[0].value;
                 const firstName = (profile.displayName) ? profile.displayName : undefined;
                 const lastName = (profile.displayName) ? profile.displayName: undefined;
                 const [user] = await User.findOrCreate({
@@ -33,7 +33,7 @@ passport.use(
 
 router.get(
     "/",
-    passport.authenticate("github", { scope: ["profile", "email"] })
+    passport.authenticate("github", { scope: ["profile", "user:email"] })
 );
 
 router.get(
