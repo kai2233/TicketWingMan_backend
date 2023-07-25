@@ -16,7 +16,9 @@ class User extends Model {
   }
 
   async validatePassword(targetPassword) {
-    return User.encryptPassword(targetPassword, this.salt) === this.password;
+    return (
+      (await User.encryptPassword(targetPassword, this.salt)) === this.password
+    );
   }
 }
 
@@ -60,16 +62,19 @@ User.init(
           user.password = await User.encryptPassword(user.password, user.salt);
         }
       },
+      // Bulk user creation
       beforeBulkCreate: async (users) => {
-        users.forEach(async (user) => {
+        for (let user of users) {
           if (user.changed("password")) {
+            // If the password field has changed, generate a new salt
             user.salt = await User.generateSalt();
+            // And encrypt the password
             user.password = await User.encryptPassword(
               user.password,
               user.salt
             );
           }
-        });
+        }
       },
     },
   }

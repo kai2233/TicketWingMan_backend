@@ -60,15 +60,28 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+// Handles PUT to update a specific user using their email: localhost:8080/api/user/email-goes-here
 router.put("/:email", async (req, res, next) => {
   try {
     const userEmail = req.params.email;
-    const foundUser = await User.findAll({ where: { email: userEmail } });
+    const foundUser = await User.findOne({ where: { email: userEmail } });
 
     if (!foundUser) {
-      res.status(400).send("Failed to update User");
+      res.status(404).send("User not found");
     } else {
-      await User.update(req.body, { where: { email: userEmail } });
+      // If newPassword is provided, update the password
+      if (req.body.password) {
+        foundUser.password = req.body.password;
+      }
+
+      // Update other user information
+      foundUser.firstName = req.body.firstName || foundUser.firstName;
+      foundUser.lastName = req.body.lastName || foundUser.lastName;
+      foundUser.email = req.body.email || foundUser.email;
+
+      // Save the updated user
+      await foundUser.save();
+
       res.status(200).send("User updated successfully");
     }
   } catch (error) {
