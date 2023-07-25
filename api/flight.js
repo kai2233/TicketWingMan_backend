@@ -1,9 +1,11 @@
-// const express = require("express");
 const router = require("express").Router();
 const { User, Flights } = require("../db/models");
 require('dotenv').config();
 const axios = require('axios');
 const Amadeus = require('amadeus');
+
+// debug purpose
+// const fs = require('fs');
 
 const amadeus = new Amadeus({
     clientId: process.env.AMADUES_CLIENT_ID,
@@ -78,10 +80,17 @@ router.get('/search', async (req, res, next) => {
                         filteredFlights, 
                         response.result.dictionaries.locations
                     );
-
-        await setEmissionCall(reslut, onewayFlag);
+        
+        // const final = [...reslut];
+        const chunk = 100;
+        const length = (reslut.length % chunk > 0 ? parseInt(reslut.length) / chunk : parseInt(reslut.length / chunk) + 1);
+        for (var i = 0; i < length; i++) {
+            await setEmissionCall(reslut.slice(i * chunk, (i * chunk) + chunk), onewayFlag);
+        }
 
         console.log('emission_call :', emission_call);
+
+        emission_call = 0;
         
         res.status(200).json(reslut);
         const endTime = new Date;
@@ -227,6 +236,14 @@ async function setEmissionCall(flightsoffered, oneway) {
             }
         }
     }
+
+    // debug purpose
+    // fs.writeFile('../data.json', JSON.stringify(emissionreq), err => {
+    //     if (err) {
+    //       console.error(err);
+    //     }
+    // });
+
     await setEmission(emissionreq, data_temp);
 }
 
