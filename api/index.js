@@ -7,6 +7,7 @@ router.use("/track", require("./track"));
 router.use("/weather", require("./weather"));
 
 router.use("/advisory", require("./advisory"));
+router.use("/airportLookup", require("./airportLookup"));
 
 // 404 Handling
 router.use((req, res, next) => {
