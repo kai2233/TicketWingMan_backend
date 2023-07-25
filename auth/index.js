@@ -17,12 +17,12 @@ passport.use(
         if (!user) {
           return done(null, false, { message: "Incorrect email" });
         }
-        if (!user.validatePassword(password)) {
+        if (!(await user.validatePassword(password))) {
           return done(null, false, { message: "Incorrect password" });
         }
         return done(null, user);
       } catch (error) {
-        console.log("USER AUTH ERROR", error);
+        done(error);
       }
     }
   )
@@ -59,7 +59,6 @@ router.post(
     res.status(200).json({
       email: req.user.email,
       id: req.user.id,
-      isAdmin: req.user.isAdmin,
     });
   }
 );
