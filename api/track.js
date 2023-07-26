@@ -2,14 +2,18 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 
-const params = {
-  access_key: "8dd0e5c3dd0d147d701ae4aabac8d758",
-};
-
 router.get("/", async (req, res, next) => {
+  const { flight_iata, flight_status } = req.query;
+
+  const params = {
+    access_key: "f9e33879613473bf10e2eedfeab64305",
+    flight_iata,
+    flight_status,
+  };
+
   try {
     const response = await axios.get(
-      "https://api.aviationstack.com/v1/flights",
+      "http://api.aviationstack.com/v1/flights",
       { params }
     );
     const apiResponse = response.data;
@@ -24,7 +28,7 @@ router.get("/", async (req, res, next) => {
         }
       });
     }
-    res.send("Flight data fetched successfully!");
+    res.send(apiResponse);
   } catch (error) {
     console.error(error);
     next(error);
