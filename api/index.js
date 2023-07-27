@@ -5,7 +5,7 @@ router.use("/user", require("./user"));
 router.use("/flights", require("./flight"));
 router.use("/track", require("./track"));
 router.use("/weather", require("./weather"));
-
+router.use('/plugs', require("./plug"));
 router.use("/advisory", require("./advisory"));
 router.use("/airportLookup", require("./airportLookup"));
 
