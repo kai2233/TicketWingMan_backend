@@ -1,5 +1,6 @@
 const db = require("./db");
-const { User, Flights } = require("./db/models");
+const { User, Flights, Plugs, Countries, CountryPlug } = require("./db/models");
+const { country_seed, plug_seed, country_plug } = require("./data");
 
 const UserSeed = [
   {
@@ -58,9 +59,16 @@ const FlightsSeed = [
   },
 ];
 
+const countrySeed = country_seed;
+const plugsSeed = plug_seed;
+const countryPlugsSeed = country_plug;
+
 const seed = async () => {
   await User.bulkCreate(UserSeed);
   await Flights.bulkCreate(FlightsSeed);
+  await Countries.bulkCreate(countrySeed);
+  await Plugs.bulkCreate(plugsSeed);
+  await CountryPlug.bulkCreate(countryPlugsSeed);
 };
 
 seed().then(() => process.exit());
