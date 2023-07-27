@@ -65,5 +65,21 @@ router.post("/displayInCelsius", async (req, res, next) => {
     }
 });
 
+router.post("/forecast", async (req, res, next) => {
+    try {
+        const { locationName, arrivalDate } = req.body;
+        const location = await axios.get(`https://geocoding-api.open-meteo.com/v1/search?name=${locationName}&count=1&language=en&format=json`);
+        const latitude = location.data.results[0].latitude;
+        const longitude = location.data.results[0].longitude;
+        const result = await axios.get
+            (`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max&temperature_unit=fahrenheit&timezone=America%2FNew_York&start_date=${arrivalDate}&end_date=${arrivalDate}`);
+        result
+            ? res.status(200).json(result.data)
+            : res.status(400).send("result not found");
+    } catch (error) {
+        next(error);
+    }
+});
+
 
 module.exports = router;
