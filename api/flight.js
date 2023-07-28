@@ -60,7 +60,7 @@ router.get('/search', async (req, res, next) => {
             travelClass : req.query.travelClass,
             currencyCode : req.query.currencyCode ? req.query.currencyCode : 'USD',
             nonStop : req.query.nonStop ? req.query.nonStop : false,
-            max : req.query.max >= 1 && req.query.max <= 250  ? req.query.max : 250
+            max : req.query.max >= 1 && req.query.max <= 100  ? req.query.max : 100
         };
         const response = await amadeus.shopping.flightOffersSearch.get(dataobj).catch(err => {
             console.error(err);
@@ -82,7 +82,7 @@ router.get('/search', async (req, res, next) => {
                     );
         
         // const final = [...reslut];
-        const chunk = 100;
+        const chunk = 50;
         const length = (reslut.length % chunk > 0 ? parseInt(reslut.length) / chunk : parseInt(reslut.length / chunk) + 1);
         for (var i = 0; i < length; i++) {
             await setEmissionCall(reslut.slice(i * chunk, (i * chunk) + chunk), onewayFlag);
