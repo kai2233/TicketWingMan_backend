@@ -440,4 +440,22 @@ async function setEmission (flightArray, finalData) {
     return response;
 }
 
+//delete the flight that stored in database based on id
+router.post("/delete", async (req, res, next) => {
+    const { flightID, userID } = req.body;
+    // const deleteCampus = await campuses.findAll({where:{ id:req.params.id}});
+    // console.log(deleteCampus);
+    // deleteCampus? await deleteCampus.destroy()
+    //   : res.status(404).send("campuses $1 Not Found", [req.params.id]);
+    // res.status(200).json(deleteCampus) 
+    try {
+        const deleteFlight = await Flights.findOne({where: { id: flightID }});
+        await deleteFlight.destroy();
+        const reslut = await Flights.findAll({ where : {userId : userID} })
+        res.status(200).json(reslut);
+      } catch (err) {
+        next(err);
+      }
+  });
+
 module.exports = router;
