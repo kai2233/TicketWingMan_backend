@@ -56,7 +56,7 @@ const setupRoutes = () => {
 };
 
 const runServer = async (port) => {
-  await db.sync({ force: false });
+  await db.sync({ force: true });
   app.listen(port, () => {
     console.log(`server is running on port 8080`);
   });
