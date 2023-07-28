@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "https://ticket-wingman.vercel.app",
+    origin: "*",
     methods: "GET,PUT,PATCH,HEAD,POST,DELETE",
     credentials: true,
     // allowedHeaders:
