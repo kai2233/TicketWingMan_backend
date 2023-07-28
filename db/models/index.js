@@ -1,5 +1,8 @@
 const User = require("./user");
 const Flights = require("./flights");
+const Plugs = require("./plug");
+const Countries = require("./country");
+const CountryPlug = require("./countryPlug");
 
 // relationship between User and Flights
 // M:N relationship
@@ -18,6 +21,18 @@ const Flights = require("./flights");
 User.hasMany(Flights);
 Flights.belongsTo(User);
 
+// M : N relationship
+Plugs.belongsToMany(Countries, {
+  through: {
+    model: CountryPlug,
+    unique: false
+}});
+Countries.belongsToMany(Plugs, {
+  through: {
+    model: CountryPlug,
+    unique: false
+}});
+
 module.exports = {
-  User, Flights
+  User, Flights, Plugs, Countries, CountryPlug
 };
