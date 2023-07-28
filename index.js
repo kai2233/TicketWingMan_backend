@@ -13,12 +13,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "https://ticket-wingman.vercel.app",
+    origin: "https://ticket-wingman.vercel.app/",
     methods: "GET,PUT,PATCH,HEAD,POST,DELETE",
     credentials: true,
-    // allowedHeaders:
-    //   "Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
-    preflightContinue: true,
   })
 );
 
@@ -39,7 +36,6 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    console.log(id)
     const user = await User.findByPk(id);
 
     done(null, user);
@@ -60,7 +56,7 @@ const setupRoutes = () => {
 };
 
 const runServer = async (port) => {
-  await db.sync();
+  await db.sync({ force: true });
   app.listen(port, () => {
     console.log(`server is running on port 8080`);
   });
@@ -68,8 +64,8 @@ const runServer = async (port) => {
 
 const configureApp = async (port) => {
   await store.sync();
-  await setupRoutes();
-  return await runServer(port);
+  setupRoutes();
+  return runServer(port);
 };
 
 module.exports = configureApp(8080);
