@@ -39,6 +39,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
+    console.log(id)
     const user = await User.findByPk(id);
 
     done(null, user);
@@ -67,8 +68,8 @@ const runServer = async (port) => {
 
 const configureApp = async (port) => {
   await store.sync();
-  setupRoutes();
-  return runServer(port);
+  await setupRoutes();
+  return await runServer(port);
 };
 
 module.exports = configureApp(8080);
