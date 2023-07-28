@@ -2,7 +2,6 @@ const router = require("express").Router();
 const { User } = require("../db/models");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const cors = require("cors");
 
 passport.use(
   "local",
@@ -77,7 +76,7 @@ router.post("/logout", (req, res, next) => {
 });
 
 // auth/me
-router.post("/me", cors(), async (req, res, next) => {
+router.post("/me", async (req, res, next) => {
   try {
     if (!req.user) {
       return;
