@@ -16,8 +16,8 @@ app.use(
     origin: "https://ticket-wingman.vercel.app",
     methods: "GET,PUT,PATCH,HEAD,POST,DELETE",
     credentials: true,
-    allowedHeaders:
-      "Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
+    // allowedHeaders:
+    //   "Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
     preflightContinue: true,
   })
 );
