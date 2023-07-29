@@ -6,17 +6,20 @@
       "use": "@now/node"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "index.js"
+      "source": "/(.*)",
+      "destination": "index.js"
     }
   ],
   "headers": [
     {
-      "source": "https://ticket-wingman.vercel.app",
+      "source": "/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" }
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
       ]
     }
   ]
