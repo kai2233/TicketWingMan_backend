@@ -38,10 +38,12 @@ router.get(
 router.get(
   "/callback",
   passport.authenticate("google", {
-    failureRedirect: "http://localhost:3000/login",
+    // failureRedirect: "http://localhost:3000/login",
+    failureRedirect: "https://ticket-wingman.vercel.app/login",
   }),
   (req, res) => {
-    res.redirect("http://localhost:3000");
+    // res.redirect("http://localhost:3000");
+    res.redirect("https://ticket-wingman.vercel.app");
   }
 );
 
