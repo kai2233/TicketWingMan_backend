@@ -21,14 +21,14 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    // origin: "https://ticket-wingman.vercel.app",
-    // methods: "GET,PUT,PATCH,HEAD,POST,DELETE",
-    // credentials: true,
-    // allowedHeaders:
-    //   "Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
-    // preflightContinue: true,
-    // origin: "https://64c52c7f71ccc679186997ee--clever-semifreddo-95587d.netlify.app",
     origin: "*",
+    // origin: "https://ticket-wingman.vercel.app",
+    methods: "GET,PUT,PATCH,HEAD,POST,DELETE",
+    // credentials: true,
+    allowedHeaders:
+      "Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
+    preflightContinue: true,
+    // origin: "https://64c52c7f71ccc679186997ee--clever-semifreddo-95587d.netlify.app",
   })
 );
 
