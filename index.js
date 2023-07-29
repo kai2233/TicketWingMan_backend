@@ -13,7 +13,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://ticket-wingman.vercel.app');
+  res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+  // res.setHeader('Access-Control-Allow-Origin', 'https://ticket-wingman.vercel.app');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   next();
 });
@@ -44,12 +45,12 @@ app.use(
   })
 );
 
-app.all('*', (req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://ticket-wingman.vercel.app");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS");
-  next();
-});
+// app.all('*', (req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "https://ticket-wingman.vercel.app");
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//   res.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS");
+//   next();
+// });
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
