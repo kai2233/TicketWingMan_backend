@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', 'https://ticket-wingman.vercel.app/');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  // res.setHeader('Access-Control-Allow-Credentials', 'true');
   next();
 });
 
@@ -28,7 +28,7 @@ app.use(
     // preflightContinue: true,
     origin: "https://ticket-wingman.vercel.app",
     methods: "GET,PUT,PATCH,HEAD,POST,DELETE",
-    credentials: true,
+    // credentials: true,
     preflightContinue: true,
   })
 );
