@@ -41,7 +41,7 @@
       ]
     },
     {
-      "source": "/64c51d97f2526273e51c2843--beautiful-nasturtium-996af8.netlify.app",
+      "source": "64c52c7f71ccc679186997ee--clever-semifreddo-95587d.netlify.app",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
@@ -50,7 +50,7 @@
       ]
     },
     {
-      "source": "64c51d97f2526273e51c2843--beautiful-nasturtium-996af8.netlify.app/(.*)",
+      "source": "64c52c7f71ccc679186997ee--clever-semifreddo-95587d.netlify.app/(.*)",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
