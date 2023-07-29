@@ -11,5 +11,13 @@
       "src": "/(.*)",
       "dest": "index.js"
     }
+  ],
+  "headers": [
+    {
+      "source": "https://ticket-wingman.vercel.app",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    }
   ]
 }
