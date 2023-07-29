@@ -39,6 +39,24 @@
           "value": "*"
         }
       ]
+    },
+    {
+      "source": "/64c51d97f2526273e51c2843--beautiful-nasturtium-996af8.netlify.app",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "64c51d97f2526273e51c2843--beautiful-nasturtium-996af8.netlify.app/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
     }
   ]
 }

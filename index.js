@@ -13,7 +13,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://ticket-wingman.vercel.app/');
+  // res.setHeader('Access-Control-Allow-Origin', 'https://ticket-wingman.vercel.app/');
+  res.setHeader('Access-Control-Allow-Origin', 'https://64c51d97f2526273e51c2843--beautiful-nasturtium-996af8.netlify.app');
   // res.setHeader('Access-Control-Allow-Credentials', 'true');
   next();
 });
@@ -26,7 +27,8 @@ app.use(
     // allowedHeaders:
     //   "Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
     // preflightContinue: true,
-    origin: "https://ticket-wingman.vercel.app",
+    // origin: "https://ticket-wingman.vercel.app",
+    origin: "https://64c51d97f2526273e51c2843--beautiful-nasturtium-996af8.netlify.app",
     methods: "GET,PUT,PATCH,HEAD,POST,DELETE",
     // credentials: true,
     preflightContinue: true,
