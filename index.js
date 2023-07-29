@@ -78,8 +78,8 @@ const runServer = async (port) => {
 
 const configureApp = async (port) => {
   await store.sync();
-  setupRoutes();
-  return runServer(port);
+  await setupRoutes();
+  return await runServer(port);
 };
 
 module.exports = configureApp(8080);
