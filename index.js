@@ -12,12 +12,12 @@ const store = new sequelizeStore({ db });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
+// app.use((req, res, next) => {
   // res.setHeader('Access-Control-Allow-Origin', 'https://ticket-wingman.vercel.app/');
-  res.setHeader('Access-Control-Allow-Origin', 'https://64c51d97f2526273e51c2843--beautiful-nasturtium-996af8.netlify.app');
-  // res.setHeader('Access-Control-Allow-Credentials', 'true');
-  next();
-});
+//   res.setHeader('Access-Control-Allow-Origin', 'https://64c51d97f2526273e51c2843--beautiful-nasturtium-996af8.netlify.app');
+//   res.setHeader('Access-Control-Allow-Credentials', 'true');
+//   next();
+// });
 
 app.use(
   cors({
@@ -30,7 +30,7 @@ app.use(
     // origin: "https://ticket-wingman.vercel.app",
     origin: "https://64c51d97f2526273e51c2843--beautiful-nasturtium-996af8.netlify.app",
     methods: "GET,PUT,PATCH,HEAD,POST,DELETE",
-    // credentials: true,
+    credentials: true,
     preflightContinue: true,
   })
 );
