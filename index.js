@@ -13,11 +13,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "https://ticket-wingman.vercel.app",
+    // origin: "https://ticket-wingman.vercel.app",
+    // methods: "GET,PUT,PATCH,HEAD,POST,DELETE",
+    // credentials: true,
+    // allowedHeaders:
+    //   "Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
+    // preflightContinue: true,
+    origin: "*",
     methods: "GET,PUT,PATCH,HEAD,POST,DELETE",
     credentials: true,
-    allowedHeaders:
-      "Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
     preflightContinue: true,
   })
 );
