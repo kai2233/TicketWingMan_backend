@@ -44,7 +44,7 @@ app.use(
   })
 );
 
-app.all('*', (req, res, next) => {
+app.all('/', (req, res, next) => {
   res.header("Access-Control-Allow-Origin", "https://ticket-wingman.vercel.app");
   res.header("Access-Control-Allow-Headers", "content-type");
   res.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS");

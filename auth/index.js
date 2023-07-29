@@ -82,6 +82,7 @@ router.post("/me", async (req, res, next) => {
       return;
     }
     const foundUser = await User.findOne({ where: { email: req.user.email } });
+    res.header("Access-Control-Allow-Origin", "*");
     res.status(200).json(foundUser);
   } catch (error) {
     console.error(error);
