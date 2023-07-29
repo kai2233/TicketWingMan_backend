@@ -83,7 +83,11 @@ router.post("/me", async (req, res, next) => {
     }
     const foundUser = await User.findOne({ where: { email: req.user.email } });
     // res.header("Access-Control-Allow-Origin", "https://ticket-wingman.vercel.app");
-    res.status(200).header("Access-Control-Allow-Origin", "https://ticket-wingman.vercel.app").json(foundUser);
+    res.writeHead(200, {
+      "Access-Control-Allow-Origin" : "https://ticket-wingman.vercel.app",
+      "content-type" : "application/json; charset=utf-8"
+    }).json(foundUser);
+    // res.status(200).json(foundUser);
   } catch (error) {
     console.error(error);
   }
