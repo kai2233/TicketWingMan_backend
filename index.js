@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://64c55a9b23a9c3138c205eea--ubiquitous-meerkat-f62c9c.netlify.app",
     methods: "GET,PUT,PATCH,HEAD,POST,DELETE",
     credentials: true,
   })
