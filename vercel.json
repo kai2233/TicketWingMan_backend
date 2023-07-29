@@ -39,24 +39,6 @@
           "value": "*"
         }
       ]
-    },
-    {
-      "source": "64c534107331c07e35625c66--mellow-rolypoly-436d07.netlify.app",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        }
-      ]
-    },
-    {
-      "source": "/64c534107331c07e35625c66--mellow-rolypoly-436d07.netlify.app/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        }
-      ]
     }
   ]
 }
