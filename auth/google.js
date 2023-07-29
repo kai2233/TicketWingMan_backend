@@ -39,11 +39,11 @@ router.get(
   "/callback",
   passport.authenticate("google", {
     // failureRedirect: "http://localhost:3000/login",
-    failureRedirect: "https://64c55a9b23a9c3138c205eea--ubiquitous-meerkat-f62c9c.netlify.app/login",
+    failureRedirect: "https://ticket-wingman.netlify.app/login",
   }),
   (req, res) => {
     // res.redirect("http://localhost:3000");
-    res.redirect("https://64c55a9b23a9c3138c205eea--ubiquitous-meerkat-f62c9c.netlify.app");
+    res.redirect("https://ticket-wingman.netlify.app");
   }
 );
 
