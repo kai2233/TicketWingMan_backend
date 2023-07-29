@@ -23,7 +23,7 @@
       ]
     },
     {
-      "source": "https://ticket-wingman.vercel.app",
+      "source": "ticket-wingman.vercel.app",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
