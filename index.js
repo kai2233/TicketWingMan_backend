@@ -11,24 +11,11 @@ const store = new sequelizeStore({ db });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// app.use((req, res, next) => {
-  // res.setHeader('Access-Control-Allow-Origin', 'https://ticket-wingman.vercel.app/');
-//   res.setHeader('Access-Control-Allow-Origin', 'https://64c52c7f71ccc679186997ee--clever-semifreddo-95587d.netlify.app');
-//   res.setHeader('Access-Control-Allow-Credentials', 'true');
-//   next();
-// });
-
 app.use(
   cors({
-    origin: "*",
-    // origin: "https://ticket-wingman.vercel.app",
+    origin: "https://ticket-wingman.netlify.app",
     methods: "GET,PUT,PATCH,HEAD,POST,DELETE",
-    // credentials: true,
-    allowedHeaders:
-      "Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
-    preflightContinue: true,
-    // origin: "https://64c52c7f71ccc679186997ee--clever-semifreddo-95587d.netlify.app",
+    credentials: true,
   })
 );
 
@@ -77,8 +64,8 @@ const runServer = async (port) => {
 
 const configureApp = async (port) => {
   await store.sync();
-  await setupRoutes();
-  return await runServer(port);
+  setupRoutes();
+  return runServer(port);
 };
 
 module.exports = configureApp(8080);
